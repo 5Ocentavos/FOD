@@ -1,4 +1,3 @@
-# el asterisco indica que voy a ignorar todos los archivos con esa extension
-*.exe
-*.o
-*.pdf
+#IGNORO TODOS LOS ARCHIVOS DE MI DIRECTORIO MENOS LOS DE EXTENSION PUNTO PAS
+*
+!*.pas
