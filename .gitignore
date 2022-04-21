@@ -1,0 +1,4 @@
+# el asterisco indica que voy a ignorar todos los archivos con esa extension
+*.exe
+*.o
+*.pdf
