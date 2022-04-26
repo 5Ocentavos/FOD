@@ -36,7 +36,7 @@ var
   pos_a_reemplazar: integer;
   ave_inicio: reg_ave;
   ave_final: reg_ave;
-  
+//con un solo registro de tipo ave me hubiese bastado
 begin
   reset (arch_aves);
   pos_a_reemplazar := 0;

@@ -17,6 +17,8 @@ que no fueron borradas, una vez realizadas todas las bajas físicas.
 
 
 program ejer6prac3;
+const 
+  valor_corte = -1;
 type
   reg_prenda = record
     codigo: integer;
@@ -29,14 +31,29 @@ type
   
   archivoObsoletas = file of integer;
 
+procedure mostrarArchivo (var arch_prendas: archivoPrendas);
+var
+  prenda: reg_prenda;
+begin
+  reset (arch_prendas);
+  while (not EOF (arch_prendas)) do
+    begin
+      read (arch_prendas, prenda);
+      writeln ('CODIGO: ', prenda.codigo);
+      writeln ('STOCK: ', prenda.stock);
+      writeln ();
+    end;
+  close (arch_prendas);
+end;
   
 procedure compactarArchivoPrendas (var arch_prendas: archivoPrendas);
 var
   prenda: reg_prenda;
   arch_prendas_actualizado: archivoPrendas;
 begin
-  assign (arch_prendas, 'archivo_prendas_actualizado');
+  assign (arch_prendas_actualizado, 'archivo_prendas_actualizado');
   rewrite (arch_prendas_actualizado);
+ 
   reset (arch_prendas);
   while (not EOF (arch_prendas)) do
     begin
@@ -46,11 +63,12 @@ begin
           write (arch_prendas_actualizado, prenda);
         end;
     end;
-  rename (arch_prendas, 'archivo_prendas_viejo');
-  erase ('archivo_prendas_viejo');
+ 
   close (arch_prendas);
+  rename (arch_prendas, 'archivo_prendas_viejo'); //PARA USAR ESTA FUNCION EL ARCHIVO TIENE QUE ESTAR CERRADO
+  erase (arch_prendas);                           //PARA ELIMINAR EL ARCHIVO TIENE QUE ESTAR CERRADO
   close (arch_prendas_actualizado);
-
+  rename (arch_prendas_actualizado, 'archivo_prendas');
 end;
 
   
@@ -84,11 +102,62 @@ begin
   close (arch_prendas);
 end;
 
+function leerCodigo : integer;
+var
+  codigo : integer;
+begin
+  write ('Ingrese el codigo: ');
+  readln (codigo);
+  leerCodigo := codigo;
+end;
+
+procedure crearArchivoObsoletas (var arch_obsoletas: archivoObsoletas);
+var
+  codigo: integer;
+begin
+  rewrite (arch_obsoletas);
+  codigo := leerCodigo ();
+  while (codigo <> valor_corte) do
+    begin
+      write (arch_obsoletas, codigo);
+      codigo := leerCodigo ();
+    end;
+  close (arch_obsoletas);
+end;
+
+procedure leerPrenda (var prenda:reg_prenda);
+begin
+  with prenda do
+    begin
+      write ('Ingrese el codigo: ');
+      readln (codigo);
+      if (codigo <> valor_corte) then
+        begin
+          write ('Ingrese tipo de prenda: ');
+		  readln (tipo_prenda);
+          write ('Ingrese el stock: ');
+          readln (stock);
+          write ('Ingrese el precio: ');
+          readln (precio);
+		  //faltan leer datos
+        end;
+    end;
+  writeln ();
+end;
 
  
 procedure crearArchivoPrendas (var arch_prendas: archivoPrendas); //se dispone 
+var
+  prenda : reg_prenda;
 begin
-
+  rewrite (arch_prendas);
+  leerPrenda (prenda);
+  while (prenda.codigo <> valor_corte) do
+    begin
+      write (arch_prendas, prenda);
+      leerPrenda (prenda);
+    end;
+  close (arch_prendas);
 end;
  
 function menuOpciones (): integer;
@@ -100,11 +169,12 @@ begin
   writeln ('2. Crear archivo prendas obsoletas para invierno');
   writeln ('3. Modificar stock prendas');
   writeln ('4. Compactar archivo prendas');
+  writeln ('5. Mostrar archivo prendas');
   writeln ('*******************************');
   write ('Ingrese una opcion: ');
   readln (opc);
   writeln;
-  if ((opc >0) and (opc < 5)) then
+  if ((opc >0) and (opc < 6)) then
     menuOpciones := opc
   else
     begin 
@@ -124,10 +194,11 @@ BEGIN
   assign (arch_obsoletas, 'archivo_prendas_obsoletas');
   opc:= menuOpciones ();
   case opc of
-    //1: crearArchivoPrendas (arch_prendas); //se dispone
-    //2: crearArchivoObsoletas (arch_obsoletas);  //se dispone
+    1: crearArchivoPrendas (arch_prendas); //se dispone
+    2: crearArchivoObsoletas (arch_obsoletas);  //se dispone
 	3: modificarStockPrendas (arch_prendas, arch_obsoletas);
     4: compactarArchivoPrendas (arch_prendas);
+    5: mostrarArchivo (arch_prendas);
   end;
 END.
 
