@@ -1,0 +1,9 @@
+56432 38.999 Nokia
+90 115 Tiene 8GB de RAM y 128GB de almacenamiento
+Ah89
+97878 99.999 Motorola
+120 5 El Motorola G200 5G tiene una memoria interna de 128 GB y 8 GB de RAM.
+G200
+878739 124.999 Samsung
+50 3 El chip más rápido, potente e inteligente se encuentra en el Galaxy S21 FE 5G. 
+S21
