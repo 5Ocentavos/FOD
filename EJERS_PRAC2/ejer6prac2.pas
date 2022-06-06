@@ -87,16 +87,17 @@ begin
     begin
       if (vec_reg_detalles[i].cod_localidad <> valor_alto) then
         begin
-          if (vec_reg_detalles[i].cod_localidad <= min_info_municipio.cod_localidad) then
+          if (vec_reg_detalles[i].cod_localidad <= min_info_municipio.cod_localidad) then   // vec = |CL 234 CC 3 | min = |CL 508 CC 2 |  
             begin
-              if (vec_reg_detalles[i].cod_cepa < min_info_municipio.cod_cepa) then
-                  begin
+              if (vec_reg_detalles[i].cod_cepa < min_info_municipio.cod_cepa) then //como el cc de la localidad 508 es más chico que 
+                  begin                                                            //la localidad 234 no se actualiza el min.... este es el error
                     min_info_municipio := vec_reg_detalles[i];
                     pos := i;
                   end;
             end;
         end;
     end;
+    
   
   if (min_info_municipio.cod_localidad <> valor_alto) then
       leerDetalle (vec_arch_detalles[pos], vec_reg_detalles[pos]);
