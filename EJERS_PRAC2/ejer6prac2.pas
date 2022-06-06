@@ -87,14 +87,17 @@ begin
     begin
       if (vec_reg_detalles[i].cod_localidad <> valor_alto) then
         begin
-          if (vec_reg_detalles[i].cod_localidad <= min_info_municipio.cod_localidad) then   // vec = |CL 234 CC 3 | min = |CL 508 CC 2 |  
+          if (vec_reg_detalles[i].cod_localidad < min_info_municipio.cod_localidad) then   // vec = |CL 234 CC 3 | min = |CL 508 CC 2 |  
             begin
-              if (vec_reg_detalles[i].cod_cepa < min_info_municipio.cod_cepa) then //como el cc de la localidad 508 es más chico que 
-                  begin                                                            //la localidad 234 no se actualiza el min.... este es el error
-                    min_info_municipio := vec_reg_detalles[i];
-                    pos := i;
-                  end;
-            end;
+              min_info_municipio := vec_reg_detalles[i];
+              pos := i;
+            end
+          else
+            if ((vec_reg_detalles[i].cod_localidad = min_info_municipio.cod_localidad) and (vec_reg_detalles[i].cod_cepa < min_info_municipio.cod_cepa)) then 
+              begin                                                            
+                min_info_municipio := vec_reg_detalles[i];
+                pos := i;        
+              end;
         end;
     end;
     
@@ -135,30 +138,31 @@ begin
 
   while (min_info_municipio.cod_localidad <> valor_alto) do
     begin
-      writeln ('entre');
       act_info_municipio.cod_localidad := min_info_municipio.cod_localidad;
       act_info_municipio.cod_cepa := min_info_municipio.cod_cepa;
-      act_info_municipio.cant_casos_activos := 0;
-      act_info_municipio.cant_casos_fallecimientos := 0;
-      act_info_municipio.cant_casos_activos := 0;
       act_info_municipio.cant_casos_recuperados := 0;
-      writeln (min_info_municipio.cod_localidad);
+      act_info_municipio.cant_casos_fallecimientos := 0;
+      
+     // writeln (min_info_municipio.cod_localidad);
       
       while ((act_info_municipio.cod_localidad = min_info_municipio.cod_localidad) and (act_info_municipio.cod_cepa = min_info_municipio.cod_cepa )) do
         begin
-            act_info_municipio.cant_casos_activos := act_info_municipio.cant_casos_activos + min_info_municipio.cant_casos_activos;
+            act_info_municipio.cant_casos_recuperados := act_info_municipio.cant_casos_recuperados + min_info_municipio.cant_casos_recuperados;
             act_info_municipio.cant_casos_fallecimientos := act_info_municipio.cant_casos_fallecimientos + min_info_municipio.cant_casos_fallecimientos;
             act_info_municipio.cant_casos_activos := min_info_municipio.cant_casos_activos;
-            act_info_municipio.cant_casos_recuperados := min_info_municipio.cant_casos_recuperados;
+            act_info_municipio.cant_casos_nuevos := min_info_municipio.cant_casos_nuevos;
             minimo(min_info_municipio, vec_reg_detalles, vec_arch_detalles);
         end;
         
       read (arch_maestro, reg_ministerio);
-      while ((reg_ministerio.info_casos_total.cod_localidad <> act_info_municipio.cod_localidad) and (reg_ministerio.info_casos_total.cod_cepa <> act_info_municipio.cod_cepa)) do
+      while ((reg_ministerio.info_casos_total.cod_localidad <> act_info_municipio.cod_localidad) or (reg_ministerio.info_casos_total.cod_cepa <> act_info_municipio.cod_cepa)) do
         read (arch_maestro, reg_ministerio);
           
       seek (arch_maestro, filePos(arch_maestro)-1);
-      reg_ministerio.info_casos_total := act_info_municipio;
+      reg_ministerio.info_casos_total.cant_casos_recuperados := reg_ministerio.info_casos_total.cant_casos_recuperados + act_info_municipio.cant_casos_recuperados;
+      reg_ministerio.info_casos_total.cant_casos_fallecimientos := reg_ministerio.info_casos_total.cant_casos_fallecimientos + act_info_municipio.cant_casos_fallecimientos;
+      reg_ministerio.info_casos_total.cant_casos_activos := act_info_municipio.cant_casos_activos;
+      reg_ministerio.info_casos_total.cant_casos_nuevos := act_info_municipio.cant_casos_nuevos;
       write (arch_maestro, reg_ministerio);
     end;
   
